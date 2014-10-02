@@ -79,7 +79,7 @@ User:
 - [ ] integrate Travis CI
 - [ ] fancy badges..
 - [ ] \(optional:) create tasks, that delete troubling model-instances
-- [ ] apply rubocop
+- [ ] apply rubocop via git-hook
 - [ ] apply generic primary_key as lookup instead of static "id"
 
 

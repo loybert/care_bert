@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    care_bert (0.0.2)
+    care_bert (0.0.3)
       rails (~> 3)
 
 GEM
