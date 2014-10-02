@@ -54,12 +54,13 @@ module CareBert
           chunk = klass.find(:all, :offset => (i * chunk_size), :limit => chunk_size)
           chunk.reject(&:valid?).each do |record|
             result[klass.name][:smell_count] += 1
-            unless result[klass.name][:errors].has_key? record.errors.full_messages
-              result[klass.name][:errors][record.errors.full_messages] = []
+            errors_key = record.errors.full_messages || ['unknown validation error!?']
+            unless result[klass.name][:errors].has_key? errors_key
+              result[klass.name][:errors][errors_key] = []
             end
-            result[klass.name][:errors][record.errors.full_messages] << record.id
+            result[klass.name][:errors][errors_key] << record.id
           end rescue nil
-          result[klass.name][:errors].each {|err| result[klass.name][:errors][err].sort! }
+          result[klass.name][:errors].select {|err| !err.nil? }.each {|err| result[klass.name][:errors][err].sort! }
         end
       end
 
