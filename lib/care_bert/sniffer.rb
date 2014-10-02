@@ -60,7 +60,9 @@ module CareBert
             end
             result[klass.name][:errors][errors_key] << record.id
           end rescue nil
-          result[klass.name][:errors].select {|err| !err.nil? }.each {|err| result[klass.name][:errors][err].sort! }
+
+          # TODO: check in which constellation the list to sort might ever be nil
+          result[klass.name][:errors].select {|err| !err.nil? }.each {|err| result[klass.name][:errors][err].sort! } rescue nil
         end
       end
 
