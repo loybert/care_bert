@@ -1,9 +1,7 @@
 module CareBert
-
   module Reporter
-
-    def self.validate_models report
-      puts "-- records -     smells - model --"
+    def self.validate_models(report)
+      puts '-- records -     smells - model --'
       report.each_key do |klass_name|
         printf "%10d - %10d - %s\n", report[klass_name][:total], report[klass_name][:smell_count], klass_name
       end
@@ -22,11 +20,10 @@ module CareBert
           puts
         end
       end
-
     end
 
-    def self.table_integrity report
-      puts "-- records - broken instances - model --"
+    def self.table_integrity(report)
+      puts '-- records - broken instances - model --'
       anything_broken = false
       report.each_key do |klass_name|
         printf "%10d - %16d - %s\n", report[klass_name][:total], report[klass_name][:broken_instances].count, klass_name
@@ -41,12 +38,10 @@ module CareBert
           printf " -  %s\n    >> %s\n\n", klass_name, report[klass_name][:broken_instances]
         end
       end
-
     end
 
-
-    def self.missing_assocs report
-      puts "-- records - broken instances - model --"
+    def self.missing_assocs(report)
+      puts '-- records - broken instances - model --'
       anything_broken = false
       report.each_key do |klass_name|
         printf "%10d - %16d - %s\n", report[klass_name][:total], report[klass_name][:smell_count], klass_name
@@ -60,7 +55,7 @@ module CareBert
         report.each_key do |klass_name|
           if report[klass_name][:errors].present?
             puts "- #{klass_name} --------------"
-            sorted_keys = report[klass_name][:errors].keys.collect{|b| b.to_i}.sort
+            sorted_keys = report[klass_name][:errors].keys.map(&:to_i).sort
             puts ">> affected_instances: #{sorted_keys}"
             sorted_keys.each do |record_id|
               printf " -  %s    >> %s\n", record_id, report[klass_name][:errors][record_id.to_s]
@@ -68,9 +63,6 @@ module CareBert
           end
         end
       end
-
     end
-
   end
-
 end

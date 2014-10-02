@@ -8,11 +8,9 @@ module CareBert
     end
   end
 
-
-  #class Railtie
-    #def self.insert
-      #---
-    #end
-  #end
-
+  # class Railtie
+  # def self.insert
+  #---
+  # end
+  # end
 end
