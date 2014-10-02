@@ -1,4 +1,6 @@
-= CareBert
+# CareBert
+
+[![Gem Version](https://badge.fury.io/rb/care_bert.svg)](http://badge.fury.io/rb/care_bert)
 
 This project rocks and uses MIT-LICENSE.
 
