@@ -23,7 +23,7 @@ namespace :care_bert do
     CareBert::Reporter.table_integrity report
   end
 
-  desc "Tries to load all instances and tracks failures on load"
+  desc "Checks all belongs_to-associations of all instances and checks presence of model if foreign-key is set"
   task :missing_assocs => :environment do
     report = CareBert::Sniffer.check_missing_assocs
     CareBert::Reporter.missing_assocs report
