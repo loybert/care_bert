@@ -1,6 +1,6 @@
 # CareBert
-
 [![Gem Version](https://badge.fury.io/rb/care_bert.svg)](http://badge.fury.io/rb/care_bert)
+[![Build Status](https://travis-ci.org/loybert/care_bert.svg?branch=master)](https://travis-ci.org/loybert/care_bert)
 
 This project rocks and uses MIT-LICENSE.
 
