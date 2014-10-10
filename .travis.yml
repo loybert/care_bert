@@ -25,8 +25,8 @@ before_script:
   # - bundle exec rake db:setup
 
 script:
-  - bundle exec rake
-  - bundle exec rspec
+  #- bundle exec rake
+  #- bundle exec rspec
 
 after_script:
   # - bundle exec rake db:setup
