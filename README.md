@@ -82,6 +82,8 @@ User:
 - [ ] apply rubocop via git-hook
 - [ ] apply generic primary_key as lookup instead of static "id"
 - [ ] refactor each single rake task to standalone class with `perform` method
+- [ ] add *care_bert* rake task, that triggers all checks (also as non verbose report, so it can be used with capistrano deploys)
+- [ ] optional: write reports into log files in temp folder or on given destination
 
 
 ## Credits
