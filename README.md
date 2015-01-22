@@ -56,8 +56,8 @@ Listing ids of missing model-instances of assocs:
 ### care\_bert:validate\_models
 Run model validations on all model records in database. Sums up all ids of failing models by the combined validation-errors.
 
-       
-       
+
+
 ```shell
 rake care_bert:validate_models
 
@@ -66,7 +66,7 @@ rake care_bert:validate_models
        314 -                0 - Photo
        278 -                7 - User
 
-User: 
+User:
 ["Name is missing"] >> [18, 42, 58, 95]
 ["Name is missing", "E-Mail contains invalid characters"] >> [12, 128, 229]
 ```
@@ -81,6 +81,7 @@ User:
 - [ ] \(optional:) create tasks, that delete troubling model-instances
 - [ ] apply rubocop via git-hook
 - [ ] apply generic primary_key as lookup instead of static "id"
+- [ ] refactor each single rake task to standalone class with `perform` method
 
 
 ## Credits
