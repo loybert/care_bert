@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ['loybert@gmail.com']
   s.homepage    = 'https://github.com/loybert/care_bert'
   s.summary     = 'CareBert takes care of the validation state of your current database items'
-  s.description = 'CareBert analyzes the current items of your database and performs differing validation and integrity tests.'
+  s.description = 'CareBert analyzes the current items of your database and performs differing validation and integrity tests. Currently it supports following checks: \n - Table Integrity => check each single model-instance of all available tables can be loaded \n - Model Validation => triggers the validation of each single model-instance (which results might have changed due code-modifications) \n - Missing Assocs => tries to load each instance of an assoc, if the foreign_key is set (having a present FK doesn\'t mean it really has the targeted model available)'
   s.license     = 'MIT'
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
