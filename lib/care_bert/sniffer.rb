@@ -6,7 +6,9 @@ module CareBert
 
       chunk_size = CareBert::Configuration::CHUNK_SIZE
 
-      Dir.glob(Rails.root.join('/app/models/**/*.rb')).each { |file| require file }
+      # Load Model definitions
+      Rails.application.eager_load!
+
       ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name).each do |klass|
         total = klass.count
 
@@ -36,7 +38,9 @@ module CareBert
 
       chunk_size = CareBert::Configuration::CHUNK_SIZE
 
-      Dir.glob(Rails.root.join('/app/models/**/*.rb')).each { |file| require file }
+      # Load Model definitions
+      Rails.application.eager_load!
+
       ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name).each do |klass|
         result[klass.name] = {
           total: klass.count,
@@ -70,7 +74,9 @@ module CareBert
 
       chunk_size = CareBert::Configuration::CHUNK_SIZE
 
-      Dir.glob(Rails.root.join('/app/models/**/*.rb')).each { |file| require file }
+      # Load Model definitions
+      Rails.application.eager_load!
+
       ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name).each do |klass|
         result[klass.name] = {
           total: klass.count,
