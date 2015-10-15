@@ -33,7 +33,7 @@ module CareBert
     end
 
     # inspired from from: http://blog.hasmanythrough.com/2006/8/27/validate-all-your-records
-    def self.validate_models
+    def self.validate_models progressbar = nil
       result = {}
 
       chunk_size = CareBert::Configuration::CHUNK_SIZE
@@ -63,8 +63,11 @@ module CareBert
           result[klass.name][:errors].select {|err| !err.nil? }.each do |err|
             result[klass.name][:errors][err].sort! rescue nil
           end
+          progressbar.increment unless progressbar.nil?
         end
       end
+
+      progressbar.total = 100 unless progressbar.nil?
 
       result
     end

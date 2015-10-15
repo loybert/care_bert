@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.test_files = Dir['test/**/*']
 
-  s.add_dependency 'rails', '~> 3'
+  s.add_dependency 'rails', '>= 3'
+  s.add_dependency 'ruby-progressbar'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rubocop'

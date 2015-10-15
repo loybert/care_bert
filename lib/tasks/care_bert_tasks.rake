@@ -11,8 +11,11 @@ require 'care_bert'
 namespace :care_bert do
   desc 'Run model validations on all model records in database'
   task validate_models: :environment do
+
+    progressbar = ProgressBar.create(starting_at: 0, total: nil, throttle_rate: 0.2)
+
     # ANALYZE all
-    report = CareBert::Sniffer.validate_models
+    report = CareBert::Sniffer.validate_models progressbar
     CareBert::Reporter.validate_models report
   end
 
