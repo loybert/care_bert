@@ -41,16 +41,16 @@ module CareBert
       # Load Model definitions
       Rails.application.eager_load!
 
-      ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name).each do |klass|
+      klasses = ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name)
+      klasses.each do |klass|
         result[klass.name] = {
           total: klass.count,
           smell_count: 0, # max klass.count
           errors: Hash.new # max klass.count
         }
 
-        (result[klass.name][:total] / chunk_size + 1).times do |i|
-          chunk = klass.find(:all, offset: (i * chunk_size), limit: chunk_size)
-          chunk.reject(&:valid?).each do |record|
+        klass.find_each(batch_size: chunk_size).each do |record|
+          [record].reject(&:valid?).each do |record|
             result[klass.name][:smell_count] += 1
             errors_key = record.errors.full_messages || ['unknown validation error!?']
             unless result[klass.name][:errors].key? errors_key
@@ -80,38 +80,46 @@ module CareBert
       # Load Model definitions
       Rails.application.eager_load!
 
-      ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name).each do |klass|
+      klasses = ActiveRecord::Base.descendants.select { |c| c.base_class == c && !c.abstract_class?}.sort_by(&:name)
+      klasses.each do |klass|
         result[klass.name] = {
           total: klass.count,
           smell_count: 0, # max klass.count
           errors: Hash.new # max klass.count
         }
 
-        (result[klass.name][:total] / chunk_size + 1).times do |i|
-          chunk = klass.find(:all, offset: (i * chunk_size), limit: chunk_size)
-          chunk.each do |record|
+        unless klass.attribute_names.include?('id')
+          result[klass.name][:smell_count] = 666666; result[klass.name][:errors]['XXXXXX'] = {table: 'broken'}
+          puts "Skipping Class #{klass.name}..."
+        else
 
-            failing_fields = {}
+          #begin
+            klass.find_each(batch_size: chunk_size).each do |record|
+              failing_fields = {}
 
-            [:belongs_to].each do |assoc_type| # optional => :has_one
-              fields = klass.reflect_on_all_associations(assoc_type).map(&:name)
+              [:belongs_to].each do |assoc_type| # optional => :has_one
+                fields = klass.reflect_on_all_associations(assoc_type).map(&:name)
 
-              fields.each do |field|
-                # puts "Check #{klass.name} => #{field}"
+                fields.each do |field|
+                  # puts "Check #{klass.name} => #{field}"
 
-                id_field = "#{field}_id"
-                if record.respond_to?(id_field)
-                  foreign_id = record.send(id_field)
-                  if foreign_id.present? && record.send(field).blank?
-                    failing_fields[field] = foreign_id
-                    result[klass.name][:smell_count] += 1
+                  id_field = "#{field}_id"
+                  if record.respond_to?(id_field)
+                    foreign_id = record.send(id_field)
+                    if foreign_id.present? && record.send(field).blank?
+                      failing_fields[field] = foreign_id
+                      result[klass.name][:smell_count] += 1
+                    end
                   end
                 end
               end
-            end
 
             result[klass.name][:errors][record.id.to_s] = failing_fields if failing_fields.present?
-          end rescue nil
+            end
+          #rescue
+          #  result[klass.name][:smell_count] = 666666
+          #  result[klass.name][:errors]['XXXXXX'] = {table: 'broken'}
+          #end # rescue nil
         end
 
       end
