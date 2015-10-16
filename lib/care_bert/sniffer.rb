@@ -42,6 +42,10 @@ module CareBert
       Rails.application.eager_load!
 
       klasses = ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name)
+      max_count = klasses.sum(&:count)
+      progressbar.total = max_count unless progressbar.nil?
+
+
       klasses.each do |klass|
         result[klass.name] = {
           total: klass.count,
@@ -67,7 +71,7 @@ module CareBert
         end
       end
 
-      progressbar.total = 100 unless progressbar.nil?
+      progressbar.finish unless progressbar.nil?
 
       result
     end
