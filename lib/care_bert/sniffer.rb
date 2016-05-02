@@ -34,42 +34,63 @@ module CareBert
 
     # inspired from from: http://blog.hasmanythrough.com/2006/8/27/validate-all-your-records
     def self.validate_models progressbar = nil
-      result = {}
+      #result = {}
 
       chunk_size = CareBert::Configuration::CHUNK_SIZE
 
       # Load Model definitions
       Rails.application.eager_load!
 
-      klasses = ActiveRecord::Base.descendants.select { |c| c.base_class == c }.sort_by(&:name)
+
+      klasses = ActiveRecord::Base .descendants
+          .select { |c| c.base_class == c && !c.abstract_class?}
+          .reject { |c| c.name.start_with?('HABTM_') }
+          .sort_by(&:name)
+      #klasses = [ATB, Client, Depot, User, Invoice, LineItem, Note, RateSheet, UsageReport, Inbound::Master, Outbound::Master]
+      #klasses -= [Note, Attachment, Event]
+      klasses = [Inbound::Shipment, Outbound::Shipment]
       max_count = klasses.sum(&:count)
       progressbar.total = max_count unless progressbar.nil?
 
+      result = {}
+      threads = []
+      #conns = ThreadSafe::Array.new
+
 
       klasses.each do |klass|
-        result[klass.name] = {
-          total: klass.count,
-          smell_count: 0, # max klass.count
-          errors: Hash.new # max klass.count
-        }
+        threads << Thread.new do
+          klass.establish_connection
+          result[klass.name] = {
+            total: klass.count,
+            smell_count: 0, # max klass.count
+            errors: Hash.new # max klass.count
+          }
+          #next
+          klass.find_each(batch_size: chunk_size).each do |record|
+            [record].reject(&:valid?).each do |record|
+              result[klass.name][:smell_count] += 1
+              errors_key = record.errors.full_messages || ['unknown validation error!?']
+              unless result[klass.name][:errors].key? errors_key
+                result[klass.name][:errors][errors_key] = []
+              end
+              result[klass.name][:errors][errors_key] << record.id
+            end rescue nil
 
-        klass.find_each(batch_size: chunk_size).each do |record|
-          [record].reject(&:valid?).each do |record|
-            result[klass.name][:smell_count] += 1
-            errors_key = record.errors.full_messages || ['unknown validation error!?']
-            unless result[klass.name][:errors].key? errors_key
-              result[klass.name][:errors][errors_key] = []
+            # TODO: check in which constellation the list to sort might ever be nil
+            result[klass.name][:errors].select {|err| !err.nil? }.each do |err|
+              result[klass.name][:errors][err].sort! rescue nil
             end
-            result[klass.name][:errors][errors_key] << record.id
-          end rescue nil
-
-          # TODO: check in which constellation the list to sort might ever be nil
-          result[klass.name][:errors].select {|err| !err.nil? }.each do |err|
-            result[klass.name][:errors][err].sort! rescue nil
+            progressbar.increment unless progressbar.nil?
           end
-          progressbar.increment unless progressbar.nil?
+          #klass.connection.close
+
+          result
         end
       end
+
+
+      thread_results = threads.map(&:join)
+      #result = thread_results.inject(&:merge)
 
       progressbar.finish unless progressbar.nil?
 
@@ -85,6 +106,10 @@ module CareBert
       Rails.application.eager_load!
 
       klasses = ActiveRecord::Base.descendants.select { |c| c.base_class == c && !c.abstract_class?}.sort_by(&:name)
+      klasses -= [Event, Attachment, Waypoint]
+      klasses = [ATB, Client, User, Invoice, LineItem, Note, RateSheet, UsageReport]
+      #klasses = [HABTM_Ancestors, HABTM_Loads, HABTM_RelatedShipments, HABTM_RelatedWorkItems, HABTM_ScheduledMasters, HABTM_ScheduledTours, HABTM_Successors, HABTM_Tours]
+
       klasses.each do |klass|
         result[klass.name] = {
           total: klass.count,
@@ -141,5 +166,19 @@ module CareBert
       end
       result
     end
+
+    def self.list_tables
+      klasses = ActiveRecord::Base.descendants.select { |c| c.base_class == c && !c.abstract_class?}.sort_by(&:name)
+      result = {}
+      klasses.each do |klass|
+        result[klass.name] = {
+            total: klass.count
+        }
+      end
+      result
+    end
+
+
   end
+
 end

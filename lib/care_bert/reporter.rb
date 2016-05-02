@@ -64,5 +64,13 @@ module CareBert
         end
       end
     end
+
+
+    def self.show_tables(report)
+      puts '-- records -   model --'
+      report.each_key do |klass_name|
+        printf "%10d -   %s\n", report[klass_name][:total], klass_name
+      end
+    end
   end
 end

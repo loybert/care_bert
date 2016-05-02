@@ -12,7 +12,11 @@ namespace :care_bert do
   desc 'Run model validations on all model records in database'
   task validate_models: :environment do
 
-    progressbar = ProgressBar.create(starting_at: 0, total: nil, throttle_rate: 0.2)
+    progressbar = ProgressBar.create(starting_at: 0, total: nil, throttle_rate: 0.2, #format: '%E %b'
+     :format         => '%a %bᗧ%i %p%% %t',
+     :progress_mark  => ' ',
+     :remainder_mark => '･'
+    )
 
     # ANALYZE all
     report = CareBert::Sniffer.validate_models progressbar
@@ -29,6 +33,13 @@ namespace :care_bert do
   task missing_assocs: :environment do
     report = CareBert::Sniffer.check_missing_assocs
     CareBert::Reporter.missing_assocs report
+  end
+
+
+  desc 'Checks all belongs_to-associations of all instances and checks presence of model if foreign-key is set'
+  task show_tables: :environment do
+    report = CareBert::Sniffer.list_tables
+    CareBert::Reporter.show_tables report
   end
 
 end
